@@ -68,7 +68,7 @@
     
     // generating a user id and file name  
     var secret_code = jsPsych.data.urlVariables().id;
-    var filename = "gabor_contrast_" + secret_code + "_part2_instr.csv"; // CHANGE THIS (file name)
+    var filename = "gabor_contrast_" + secret_code + "_part1_noInstr.csv"; // CHANGE THIS (file name)
 
 
     // capture info from Prolific
@@ -94,7 +94,7 @@
     const save_data = {
         type: jsPsychPipe,
         action: "save",
-        experiment_id: "DQSp4hNB7T2S",
+        experiment_id: "DbfSaVhA7T0p",
         filename: filename,
         data_string: ()=>jsPsych.data.get().csv()
     };
@@ -280,27 +280,28 @@
     };
     timeline.push(displayAdjust)
 
-          
-   /* define testing instructions */
-   var instructions = {
+      
+      
+       /* define testing instructions */
+       var instructions = {
       type: jsPsychHtmlButtonResponse, // CHANGE THIS (instructions)
       stimulus: "<p>In each trial of this task, you will see three images: one target item on top, and two choices beneath the target item." +
-        "</p><p>For each trial, please select the item that is most like the target item<br>" +
-        "<strong>in terms of orientation.</strong><br>"+
-        "If you think the item on the <strong>left</strong> is most similar to the item on top in terms of orientation, please press the left arrow key.<br>" +
-        "If you think the item on the <strong>right</strong> is most similar to the item on top in terms of orientation, please press the right arrow key.<br>" +
+        "</p><p>For each trial, <strong>please select the item that is most like the target item.</strong><br>"+
+        "If you think the item on the <strong>left</strong> is most similar to the item on top, please press the left arrow key.<br>" +
+        "If you think the item on the <strong>right</strong> is most similar to the item on top, please press the right arrow key.<br>" +
         "<p>There may be trials with no obvious answer. In those cases, use your best judgment." +
         "<p>There will be 3 rounds of this task with 205 trials per round. You will have the opportunity to take breaks between rounds. </p>"+
-          "<p>Click 'Continue' to move on.</p>",
+          "<p>Click 'Continue' to begin the test.</p>",
         choices: ["Continue"],
         post_trial_gap: 2000,
         on_finish: function(){
             shuffle(validation_concat);
+
         }
     };
    timeline.push(instructions);  
-      
-      
+
+
       var fixation = {
           type: jsPsychHtmlKeyboardResponse,
             stimulus: '+',
@@ -842,7 +843,7 @@ var demographics = {
         + "through similarity tasks like the one in this experiment. We expect that people will systematically differ in their "
         + "perceptions of how similar colors are to each other."
         + "You may now exit this page. Thank you for participating!</p>"
-     //   + "<strong> Here is your secret code: CLAUIODC </strong><br> Goodbye!<br><br>";
+        + "<strong> Here is your secret code: CLAUIODC </strong><br> Goodbye!<br><br>";
       return output;
       },
       choices: ["<a href='https://app.prolific.com/submissions/complete?cc=CLAUIODC'>Complete Experiment</a>"]    
