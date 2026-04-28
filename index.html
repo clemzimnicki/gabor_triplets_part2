@@ -42,7 +42,9 @@
   </head>
   <body></body>
   <script>
-
+    //<script src="https://unpkg.com/jspsych@8.0.2"><script>
+   // <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"><script>
+    //<script src="https://unpkg.com/jspsych@7.3.4">
 
     var jsPsych = initJsPsych({
         show_progress_bar:false,
@@ -66,10 +68,24 @@
     
     // generating a user id and file name  
     var secret_code = jsPsych.data.urlVariables().id;
-    var filename = "gabor_" + secret_code + "_part2_instr.csv"; // CHANGE THIS (file name)
+    var filename = "gabor_contrast_" + secret_code + "_part2_instr.csv"; // CHANGE THIS (file name)
 
 
-   
+    // capture info from Prolific
+   // var subject_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
+  //  var study_id = jsPsych.data.getURLVariable('STUDY_ID');
+   // var session_id = jsPsych.data.getURLVariable('SESSION_ID');
+
+       // uncomment all below for Prolific
+    //jsPsych.data.addProperties({
+    //subject_id: subject_id
+    //study_id: study_id,
+    //session_id: session_id
+    //});
+    
+    // generating a user id and file name  
+    //var secret_code = jsPsych.data.urlVariables().id;
+    //var filename = "triplets_colors_" + secret_code + "_part1.csv"; // CHANGE THIS (file name)
 
     //const subject_id = jsPsych.randomization.randomID(10);
     //const filename = `${subject_id}.csv`;
@@ -78,7 +94,7 @@
     const save_data = {
         type: jsPsychPipe,
         action: "save",
-        experiment_id: "DQSp4hNB7T2S", // part 2, exp 3: DQSp4hNB7T2S
+        experiment_id: "DQSp4hNB7T2S",
         filename: filename,
         data_string: ()=>jsPsych.data.get().csv()
     };
@@ -144,6 +160,20 @@
         return temp_array;
     }
       
+ /*     
+    //check if mac, and if not, redirect
+        var isMac = navigator.platform.indexOf('Mac') !== -1;
+       
+        // If the user is not on a Mac, we can end the experiment right after the warning
+        if (!isMac) {
+            var endExperiment = {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: "Thank you for your time, but unfortunately this experiment is only available on Mac computers. You may now exit this window.",
+                choices: "NO_KEYS"
+            };
+            timeline.push(endExperiment);
+        }
+*/
 
     //define welcome message trial 
     var welcome = {
@@ -157,6 +187,14 @@
       type: jsPsychFullscreen,
       fullscreen_mode: true
     });    
+         
+    /* define consent trail 
+    var consent = {
+        type: jsPsychImageButtonResponse,
+        stimulus: "kc_lab_consent_prolific.png", // CHANGE THIS (to Mturk/Prolific or SONA depending on your sample)
+        choices: ["Consent & Continue"]
+    };
+    timeline.push(consent);*/
 
     var consent = {
         type: jsPsychHtmlButtonResponse, // CHANGE THIS (instructions)
@@ -242,29 +280,27 @@
     };
     timeline.push(displayAdjust)
 
-      
-      
-       /* define testing instructions */
-       var instructions = {
+          
+   /* define testing instructions */
+   var instructions = {
       type: jsPsychHtmlButtonResponse, // CHANGE THIS (instructions)
       stimulus: "<p>In each trial of this task, you will see three images: one target item on top, and two choices beneath the target item." +
-        "</p><p>For each trial, please select the item that is most like the target item<br>"+
+        "</p><p>For each trial, please select the item that is most like the target item<br>" +
         "<strong>in terms of orientation.</strong><br>"+
-        "If you think the item on the <strong>left</strong> is most similar to the item on top, please press the left arrow key.<br>" +
-        "If you think the item on the <strong>right</strong> is most similar to the item on top, please press the right arrow key.<br>" +
+        "If you think the item on the <strong>left</strong> is most similar to the item on top in terms of orientation, please press the left arrow key.<br>" +
+        "If you think the item on the <strong>right</strong> is most similar to the item on top in terms of orientation, please press the right arrow key.<br>" +
         "<p>There may be trials with no obvious answer. In those cases, use your best judgment." +
         "<p>There will be 3 rounds of this task with 205 trials per round. You will have the opportunity to take breaks between rounds. </p>"+
-          "<p>Click 'Continue' to begin the test.</p>",
+          "<p>Click 'Continue' to move on.</p>",
         choices: ["Continue"],
         post_trial_gap: 2000,
         on_finish: function(){
             shuffle(validation_concat);
-
         }
     };
    timeline.push(instructions);  
-
-
+      
+      
       var fixation = {
           type: jsPsychHtmlKeyboardResponse,
             stimulus: '+',
@@ -620,8 +656,129 @@
     timeline.push(quick_break);
     timeline.push(procedure);
 
-  
+  //-----------------------------------------color vision check-----------------------------------------
+/*
+      // Ishihara color vision check //
+  var ishihara_instructions = {
+    type: jsPsychHtmlKeyboardResponse,
+        stimulus: 
+        "<p>Next, you will see an image on the screen." +
+        "<br>If you see a number in the image, please type that number in the box.</p>"+
+        "<p>If you do not see a number in the image, please type 'None' in the box."+
+        "<br>This part of the experiment will take about 1 minute.</p>"+
+        "<p>Please press the spacebar to begin.</p>",
+        post_trial_gap: 500,
+        choices: [" "]
+    };
+    timeline.push(ishihara_instructions);
 
+
+    //random function
+    function getRandomIntInclusive(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return  Math.floor(Math.random() * (max - min + 1));
+        }
+    //
+
+    //Loop to present 11 ishihara plates of a unique type
+   var plateCounter = [0,0,0,0,0,0,0,0,0,0,0]
+   var numPlates = 11; 
+   for (plateNum = 0; plateNum < numPlates;){
+
+
+        //Randomly select which plate to present
+        var whichPlate = getRandomIntInclusive(0,10);
+
+        //always present this plate first
+        if (plateNum == 0){
+                whichPlate = 0;
+                answer  =  JSON.stringify({"ishihara":"12"});
+        }
+
+        // specify correct answer
+        if (whichPlate == 1){
+            answer = JSON.stringify({"ishihara":"8"});
+        }else if (whichPlate == 2){
+            answer = JSON.stringify({"ishihara":"5"}); 
+        }else if (whichPlate == 3){
+            answer = JSON.stringify({"ishihara":"29"}); 
+        }else if (whichPlate == 4){
+            answer = JSON.stringify({"ishihara":"74"});
+        }else if (whichPlate == 5){
+            answer = JSON.stringify({"ishihara":"7"}); 
+        }else if (whichPlate == 6){
+            answer = JSON.stringify({"ishihara":"45"});  
+        }else if (whichPlate == 7){
+            answer = JSON.stringify({"ishihara":"2"}); 
+        }else if (whichPlate == 8){
+            answer = JSON.stringify({"ishihara":"16"});
+        }else if (whichPlate == 9){
+            answer = JSON.stringify({"ishihara":"35"}); 
+        }else if (whichPlate == 10){
+            answer = JSON.stringify({"ishihara":"96"}); 
+
+        }   
+        //Check to ensure this plate not previously presented
+        if (plateCounter[whichPlate] == 0) {
+            //Present trial
+            var ishihara_plate = {
+                type: jsPsychImageTextResponseMAS,
+                stimulus: "ishiharaPlateImg/ishihara-"+whichPlate+".png", 
+                stimulus_height: 400, 
+                correctAnswer: answer,
+                on_start: function(trial) {
+                    correctAnswer = trial.correctAnswer}, //recorded in the "prompt" column of the output
+                questions: [
+                    { prompt: "Carefully type what number you see. "+
+                        "<p>If you do not see a number, type 'None'.",
+                    rows: 1, 
+                    columns: 1,
+                    required: true,
+                    name: 'ishihara'}],
+                    button_label: "Next",
+                    on_finish: function(data){
+                            if(data.responses == correctAnswer){
+                                data.correct = 1;  //correct
+                            } else {
+                                data.correct = 0;}} //incorrect
+                    }         
+            timeline.push(ishihara_plate) 
+            plateCounter[whichPlate] = 1; 
+            plateNum++
+        }
+    }
+
+
+    // Color Vision check //
+    var colorvision = {
+        type: jsPsychSurveyMultiSelect,
+        questions: [
+            {prompt: "Do you have difficulty seeing colors or noticing differences<br>between colors compared to the average person?",
+            options: ["Yes", "No"],
+            horizontal: false,
+            required: true, 
+            name: 'colorDifficulty'},
+
+            {prompt: "Do you consider yourself to be colorblind? ",
+            options: ["Yes", "No"],
+            horizontal: false,
+            required: true, 
+            name: 'colorBlind'},
+
+            {prompt: "What device did you use to complete this experiment?",
+            options: ["Computer", "Tablet", "Phone", "Other"],
+            horizontal: false,
+            required: true, 
+            name: 'device'}
+        ],
+        preamble: "",
+        button_label: "Done",
+        randomize_question_order: false,
+        }; 
+    timeline.push(colorvision); 
+ */
+    //-----------------------------------------end ishihara-----------------------------------------
     
 var demographic_instructions = {
       type: jsPsychHtmlButtonResponse,
@@ -683,9 +840,9 @@ var demographics = {
         + "animals remain very similar between people."
         + "We think that the amount that people differ has been consistently underestimated. One way that we are testing for this is "
         + "through similarity tasks like the one in this experiment. We expect that people will systematically differ in their "
-        + "perceptions of how similar orientations are to each other."
+        + "perceptions of how similar colors are to each other."
         + "You may now exit this page. Thank you for participating!</p>"
-        //+ "<strong> Here is your secret code: CLAUIODC </strong><br> Goodbye!<br><br>";
+     //   + "<strong> Here is your secret code: CLAUIODC </strong><br> Goodbye!<br><br>";
       return output;
       },
       choices: ["<a href='https://app.prolific.com/submissions/complete?cc=CLAUIODC'>Complete Experiment</a>"]    
@@ -700,6 +857,15 @@ var demographics = {
     type: 'fullscreen',
     fullscreen_mode: false
     })
+
+      
+//     // this is to save to normal server
+//    function saveData(name, data){
+//      var xhr = new XMLHttpRequest();
+//      xhr.open('POST', 'data_write.php'); // 'write_data.php' is the path to the php file described above.
+//      xhr.setRequestHeader('Content-Type', 'application/json');
+//      xhr.send(JSON.stringify({filename: name, filedata: data}));
+//    }
     
 
       
